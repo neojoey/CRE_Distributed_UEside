@@ -1137,7 +1137,7 @@ LteEnbMac::DoSchedDlConfigInd (FfMacSchedSapUser::SchedDlConfigIndParameters ind
 
 	//for Distributed bias algorithm #1 by joey 2016.05.03
 	//creating msg of broadcasting outage count for bias update by each UE
-	std::cout << "MAC recieves outage count : " << ind.outageCount << std::endl;
+	//std::cout << "MAC recieves outage count : " << ind.outageCount << std::endl;
 	//m_enbPhySapProvider->UpdateOutageCount ( uint32_t(ind.outageCount) );
 	m_cmacSapUser->UpdateOutageCount ( uint32_t(ind.outageCount) );
 }

@@ -131,6 +131,7 @@ class QTable : public Object
 		uint16_t GetMaxCellId ();
 		double GetBiasValue ();
 
+		void ChangeEGreedyProbability ();
 
 	private:
 		std::map <uint16_t, MeasValues> m_quantizedMeasValues;
@@ -143,6 +144,7 @@ class QTable : public Object
 		double alpha;	//learning ratne
 		uint64_t m_imsi;
 		double gamma;	//discount factor
+		double m_eGreedyProb;
 		
 };
 

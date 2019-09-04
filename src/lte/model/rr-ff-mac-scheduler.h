@@ -182,7 +182,7 @@ public:
 		{
 			macroRr->InitiateAbs ();
 			absEnabled = true;
-			std::cout << "abs invoked..." << std::endl;
+			//std::cout << "abs invoked..." << std::endl;
 		}
 	}
 	// abs update sent from pico station.

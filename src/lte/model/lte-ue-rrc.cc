@@ -43,8 +43,10 @@ NS_LOG_COMPONENT_DEFINE ("LteUeRrc");
 QTable::QTable () 
 	:	m_lastAction (0),
 		alpha (0.5),
-		gamma (0.5)
+		gamma (0.5),
+		m_eGreedyProb (0)
 {
+	Simulator::Schedule ( MilliSeconds(60000), &QTable::ChangeEGreedyProbability, this);
 }
 
 QTable::~QTable () {
@@ -70,7 +72,7 @@ QTable::Quantization ( std::map <uint16_t, MeasValues> storedMeasValues )
 		MeasValues quantizedValues;
 		quantizedValues.rsrp = round (it->second.rsrp);
 		quantizedValues.rsrq = round (it->second.rsrq);
-		std::cout << "Quan ( " << it->first << ", " << quantizedValues.rsrp << ", " << quantizedValues.rsrq << " )" << std::endl;
+		//std::cout << "Quan ( " << it->first << ", " << quantizedValues.rsrp << ", " << quantizedValues.rsrq << " )" << std::endl;
 
 		m_quantizedMeasValues.insert ( std::make_pair (it->first, quantizedValues) );
 	}
@@ -94,7 +96,7 @@ QTable::MakeState ( std::map <uint16_t, MeasValues> quantizedMeasValues )
 	}
 	m_currentQState.pPbs = maxRsrp;
 	m_currentQState.picoCellId = maxCellId;
-	std::cout << "((( " << m_currentQState.pPbs << ", " << m_currentQState.picoCellId << " )))" << std::endl;
+	//std::cout << "((( " << m_currentQState.pPbs << ", " << m_currentQState.picoCellId << " )))" << std::endl;
 }
 
 
@@ -130,7 +132,7 @@ QTable::UpdateQTable (QState currentQState, uint32_t outageCount)
 		tmpInnerValue.insert (std::make_pair( 0, outageCount ));
 		m_qTable.insert ( std::make_pair (currentQState, tmpInnerValue) );
 		m_prevQState = currentQState;
-		std::cout << "New State Added (" << currentQState.pMbs << ", " << currentQState.pPbs << " , "<< currentQState.picoCellId << " )" << std::endl;
+		//std::cout << "New State Added (" << currentQState.pMbs << ", " << currentQState.pPbs << " , "<< currentQState.picoCellId << " )" << std::endl;
 	}
 	SelectAction (currentQState);
 
@@ -142,9 +144,9 @@ QTable::SelectAction (QState currentQState)
 	double actionBias;
 	QTABLE::iterator it = m_qTable.find ( currentQState );
 	// first time execute if statement after then execute else statement
-	if ( it->second.size () < 32 ) {
-		for (uint8_t tmpCount = 0; tmpCount < 33; tmpCount++ ) {
-			it->second.insert( std::make_pair( tmpCount, 0 ) );
+	if ( it->second.size () < 16 ) {
+		for (uint8_t tmpCount = 0; tmpCount < 17; tmpCount++ ) {
+			it->second.insert (std::make_pair (tmpCount, ((std::rand ()%100)/100.0 )));
 		}
 		actionBias = 0;
 		/*
@@ -156,7 +158,7 @@ QTable::SelectAction (QState currentQState)
 		double minQValue = 999999999999;
 		std::map<double, double>::iterator actionIt;
 		for ( actionIt = it->second.begin (); actionIt != it->second.end (); ++actionIt ) {
-			std::cout << "QVal : " << actionIt->second << " Bias : " << actionIt->first << std::endl;
+			//std::cout << "QVal : " << actionIt->second << " Bias : " << actionIt->first << std::endl;
 			if ( (*actionIt).second < minQValue ) {
 				minQValue = actionIt->second;
 				actionBias = actionIt->first;
@@ -170,12 +172,20 @@ QTable::SelectAction (QState currentQState)
 			}
 		}
 
-		std::map<double, double>::iterator minIt = sameValue.begin ();
-		int ind = (std::rand () % sameValue.size ());
-		std::advance (minIt, ind);	// ramdomly select bias among the same min values
-		actionBias = minIt->first;
+		//Need implement an Explore and Exploit part HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		//e-greedy E & E
+		double randomNo;
+		randomNo = double ((std::rand ()%100)/100.0);
+		if (randomNo < m_eGreedyProb) {
+			actionBias = std::rand ()%17;
+		} else {
+			std::map<double, double>::iterator minIt = sameValue.begin ();
+			int ind = (std::rand () % sameValue.size ());
+			std::advance (minIt, ind);	// ramdomly select bias among the same min values
+			actionBias = minIt->first;
+		}
 
-		std::cout << Simulator::Now () << " IMSI : " <<  m_imsi <<  " minQVal : " << minQValue << "#### Action Bias : " << actionBias << " ind: " << ind << std::endl;
+		std::cout << Simulator::Now () << " IMSI : " <<  m_imsi <<  " minQVal : " << minQValue << "#### Action Bias : " << actionBias << std::endl;
 	}
 	m_lastAction = actionBias;
 }
@@ -197,6 +207,12 @@ QTable::GetBiasValue ()
 {
 	return m_lastAction;
 }
+
+void
+QTable::ChangeEGreedyProbability () {
+	m_eGreedyProb = 0.1;
+}
+
 
 
 /////////////////////////////
@@ -286,6 +302,7 @@ LteUeRrc::LteUeRrc ()
     m_rrcSapUser (0),
     m_macSapProvider (0),
     m_asSapUser (0),
+		m_globalOutageCount (0),
     m_state (IDLE_START),
     m_imsi (0),
     m_rnti (0),
@@ -972,7 +989,7 @@ LteUeRrc::DoSaveGlobalOutageCount (uint32_t outageCount)
 	//Simulator::Schedule ( MilliSeconds(510), &LteUeCphySapProvider::UpdateBias, m_cphySapProvider,  m_qTable->GetMaxCellId (), m_qTable->GetBiasValue () );
 	
 	//Simulator::Schedule ( MilliSeconds(500), &QTable::InvokeBias, m_qTable, tmpValue, outageCount );
-	std::cout << Simulator::Now () << "Saving Global Outage Count: " << m_globalOutageCount << " at UE RRC layer... " << std::endl;
+	//std::cout << Simulator::Now () << "Saving Global Outage Count: " << m_globalOutageCount << " at UE RRC layer... " << std::endl;
 }
 
 
@@ -3062,10 +3079,9 @@ LteUeRrc::StartBiasAlgorithm ()
 {
 	m_qTable->InvokeBias ( m_storedMeasValues, m_globalOutageCount, m_imsi );
 	m_cphySapProvider->UpdateBias ( m_qTable->GetMaxCellId (), m_qTable->GetBiasValue () );
-	std::cout << "Inkove Update - Cid: " << m_qTable->GetMaxCellId () << " , bias : " << m_qTable->GetBiasValue () << std::endl;
+	//std::cout << "Inkove Update - Cid: " << m_qTable->GetMaxCellId () << " , bias : " << m_qTable->GetBiasValue () << std::endl;
 
 	Simulator::Schedule ( MilliSeconds(500), &LteUeRrc::StartBiasAlgorithm, this);
 }
-
 } // namespace ns3
 

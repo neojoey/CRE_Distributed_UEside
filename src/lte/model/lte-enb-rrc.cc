@@ -2274,7 +2274,7 @@ LteEnbRrc::DoRecvGlobalOutageCount (EpcX2SapUser::OutageCountParams params)
 	NS_LOG_LOGIC ("GlobalOutageCount = " << params.outageCount);
 
 	m_globalOutageCount = params.outageCount;
-	std::cout << Simulator::Now() << " ### Global Outage Count = " << m_globalOutageCount << std::endl;
+	//std::cout << Simulator::Now() << " ### Global Outage Count = " << m_globalOutageCount << std::endl;
 
 	//reset local outage count of PBSs
 	//MBS's local count is reset when it sends global outage count to PBSs
@@ -2309,12 +2309,12 @@ LteEnbRrc::DoUpdateOutageCount (uint32_t outageCount)
 	m_localOutageCount = 10 *((0.9 * m_localOutageCount) + (0.1 * outageCount));
 	//m_localOutageCount = (0.1 * m_localOutageCount) + (0.9 * outageCount);
 	//m_localOutageCount = m_localOutageCount + outageCount;
-	std::cout << Simulator::Now() << " TEST at RRC level : m_outageCount = " << m_localOutageCount << std::endl;
+	//std::cout << Simulator::Now() << " TEST at RRC level : m_outageCount = " << m_localOutageCount << std::endl;
 	if ( m_cellId != 1) {
 		EpcX2Sap::OutageCountParams params;
 		params.sourceCellId = m_cellId;
 		params.outageCount = m_localOutageCount;
-		std::cout << "CellId = " << params.sourceCellId << " Count = " << params.outageCount << std::endl;
+		//std::cout << "CellId = " << params.sourceCellId << " Count = " << params.outageCount << std::endl;
 		m_x2SapProvider->SendOutageCount( params );
 	}
 }

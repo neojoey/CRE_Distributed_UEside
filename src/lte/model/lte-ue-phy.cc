@@ -866,11 +866,13 @@ LteUePhy::ReportUeMeasurements ()
 			{
 				rpB = itBias->second;
 				//for test
+				/*
 				std::cout << Simulator::Now() << " at ReportUeMesurements"
 																			<< " CellId " << (*it).first
                        								<< " RSRP " << avg_rsrp << "+" << rpB  
                         							<< " (nSamples " << (uint16_t)(*it).second.rsrpNum << ")"
                         							<< " RSRQ " << avg_rsrq << "+" << rqB << std::endl;
+				*/
 				
 			}
 
@@ -1009,7 +1011,7 @@ LteUePhy::ReceiveLteControlMessageList (std::list<Ptr<LteControlMessage> > msgLi
 				Ptr<OutageCtrlMessage> out = DynamicCast <OutageCtrlMessage> (msg);
 				m_globalOutageCount = out->GetOutageCount ();
 				m_ueCphySapUser->SaveGlobalOutageCount (m_globalOutageCount);
-				std::cout << Simulator::Now() << " UE #" << m_rnti << " receives outage count : " <<  m_globalOutageCount << " from CID =" << m_cellId << std::endl;
+				//std::cout << Simulator::Now() << " UE #" << m_rnti << " receives outage count : " <<  m_globalOutageCount << " from CID =" << m_cellId << std::endl;
 				NS_LOG_INFO (this << Simulator::Now() << " UE #" << m_rnti << " receives outage count : " <<  m_globalOutageCount << " from CID =" << m_cellId);
 			}
 #endif
@@ -1453,7 +1455,7 @@ LteUePhy::DoUpdateBias (uint16_t cellId, double bias )
 	} else {
 		m_bias->biasList.insert ( std::make_pair( cellId, bias ) );
 	}
-	std::cout << Simulator::Now() << " Bias UPDATE ed......... Cell Id : " << cellId <<  "Bias : " <<  bias  << std::endl;
+	//std::cout << Simulator::Now() << " Bias UPDATE ed......... Cell Id : " << cellId <<  "Bias : " <<  bias  << std::endl;
 }
 
 void 

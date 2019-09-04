@@ -443,7 +443,6 @@ class OutageCtrlMessage : public LteControlMessage
 		double m_outageCount;
 };
 
-
 } // namespace ns3
 
 #endif  // LTE_CONTROL_MESSAGES_H
