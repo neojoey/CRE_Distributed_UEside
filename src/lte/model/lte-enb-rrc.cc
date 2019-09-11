@@ -2389,10 +2389,11 @@ LteEnbRrc::DoTriggerHandover (uint16_t rnti, uint16_t targetCellId)
 
 	//by Joey
 	//do not allow a handover when the connected time of the rnti is not enough long
+	//without this func. sim causes error that cannot find an UE at UE managers as the UEs increases
 	//now set 1 sec
-#if 0
+#if 1
 	std::cout << "Now : " << Simulator::Now () << " C-time : " << ueManager->GetConnectedTime () << " Diff : " << Simulator::Now() - ueManager->GetConnectedTime () << std::endl;
-	if ( (Simulator::Now () - ueManager->GetConnectedTime ()) < NanoSeconds (1000000000))
+	if ( (Simulator::Now () - ueManager->GetConnectedTime ()) < NanoSeconds (1000000))
 		{
 			isHandoverAllowed = false;
 		}

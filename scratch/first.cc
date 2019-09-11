@@ -542,9 +542,9 @@ int main (int argc, char *argv[])
 	Config::SetDefault ("ns3::LteHelper::AnrEnabled", BooleanValue (true));
 	
 	// Error Free model
-	Config::SetDefault ("ns3::LteHelper::UseIdealRrc", BooleanValue (true));
+	//Config::SetDefault ("ns3::LteHelper::UseIdealRrc", BooleanValue (true));
 	Config::SetDefault ("ns3::LteSpectrumPhy::CtrlErrorModelEnabled", BooleanValue(false));
-	//Config::SetDefault ("ns3::LteSpectrumPhy::DataErrorModelEnabled", BooleanValue(false));
+	Config::SetDefault ("ns3::LteSpectrumPhy::DataErrorModelEnabled", BooleanValue(false));
 
 	//HANDOVER_LEAVING_TIMEOUT (default 500)
 	//Config::SetDefault ("ns3::LteEnbRrc::HandoverLeavingTimeoutDuration", TimeValue (MilliSeconds (800)));

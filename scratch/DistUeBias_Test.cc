@@ -576,7 +576,7 @@ int main (int argc, char *argv[])
 	int nUes = 100;
 	int packetSize = 300; //bytes
 #ifdef PICOCELL
-#if 0
+#if 1
 	Vector cellCenter = Vector( 512.0, 512.0, 0.0 );
 	double cellRadius = 512.0;
 #else
@@ -670,9 +670,9 @@ int main (int argc, char *argv[])
 	Config::SetDefault ("ns3::LteHelper::AnrEnabled", BooleanValue (true));
 	
 	// Error Free model
-	//Config::SetDefault ("ns3::LteHelper::UseIdealRrc", BooleanValue (true));
+	Config::SetDefault ("ns3::LteHelper::UseIdealRrc", BooleanValue (true));
 	Config::SetDefault ("ns3::LteSpectrumPhy::CtrlErrorModelEnabled", BooleanValue(false));
-	Config::SetDefault ("ns3::LteSpectrumPhy::DataErrorModelEnabled", BooleanValue(false));
+	//Config::SetDefault ("ns3::LteSpectrumPhy::DataErrorModelEnabled", BooleanValue(false));
 
 	//HANDOVER_LEAVING_TIMEOUT (default 500)
 	//Config::SetDefault ("ns3::LteEnbRrc::HandoverLeavingTimeoutDuration", TimeValue (MilliSeconds (800)));
@@ -695,8 +695,8 @@ int main (int argc, char *argv[])
 	// It causes an problem when remote hosts create more than 100 packets at the same time.
 	// So, it can be problem when increasing the number of UE nodes
 	Config::SetDefault ("ns3::DropTailQueue::MaxPackets", UintegerValue (1000));
-	Config::SetDefault ("ns3::RrFfMacScheduler::HarqEnabled", BooleanValue (false));
-	//Config::SetDefault ("ns3::RrFfMacScheduler::HarqEnabled", BooleanValue (true));
+	//Config::SetDefault ("ns3::RrFfMacScheduler::HarqEnabled", BooleanValue (false));
+	Config::SetDefault ("ns3::RrFfMacScheduler::HarqEnabled", BooleanValue (true));
 	
 	//RLC AM, BufferBloat
 	Config::SetDefault ("ns3::LteEnbRrc::EpsBearerToRlcMapping", EnumValue (ns3::LteEnbRrc::RLC_AM_ALWAYS));
@@ -1288,6 +1288,7 @@ int main (int argc, char *argv[])
 		}
 		if (iter->second.rxBytes > 0)
 		{
+#if 0
     	//NS_LOG_UNCOND("Throughput: " << iter->second.rxBytes * 8.0 / (iter->second.timeLastRxPacket.GetSeconds()-iter->second.timeFirstTxPacket.GetSeconds()) / 1024  << " Kbps");
 			throughputArray[tmpIdx] = iter->second.rxBytes * 8.0 / (iter->second.timeLastRxPacket.GetSeconds()-iter->second.timeFirstTxPacket.GetSeconds()) / 1024;
 			NS_LOG_UNCOND("Throughput:: " << throughputArray[tmpIdx] << " Kbps");
@@ -1297,11 +1298,20 @@ int main (int argc, char *argv[])
 		} else {
 			NS_LOG_UNCOND("Throughput:: " << "0" << " Kbps");
 			throughputArray[tmpIdx] = 0;
+#endif
 		}
 		tmpIdx++;
  		NS_LOG_UNCOND("Packet loss %= " << ((iter->second.txPackets-iter->second.rxPackets)*1.0)/iter->second.txPackets);
 #endif
   }
+	
+	//Throughput
+	for (uint32_t i = 0; i < remotesForUes.GetN (); i++) 
+	{
+		Ptr<PacketSink> sink = ueSinkApp.Get (i)->GetObject<PacketSink> ();
+		throughputArray[i] = sink->GetTotalRx () * 8 / (applicationEnd - applicationStart) / 1000;
+		std::cout << "UE" << i << '(' << ueIfs.GetAddress(i) << "):" << sink->GetTotalRx () * 8 / (applicationEnd - applicationStart) / 1000000 << "Mbps" << std::endl;
+	}
 
 	std::cout << "Throughput Percentage " << std::endl;
 	for (int i=0; i<nUes; i++ ) {

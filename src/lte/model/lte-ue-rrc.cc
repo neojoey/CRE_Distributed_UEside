@@ -144,7 +144,7 @@ QTable::SelectAction (QState currentQState)
 	double actionBias;
 	QTABLE::iterator it = m_qTable.find ( currentQState );
 	// first time execute if statement after then execute else statement
-	if ( it->second.size () < 16 ) {
+	if ( it->second.size () < 17 ) {
 		for (uint8_t tmpCount = 0; tmpCount < 17; tmpCount++ ) {
 			it->second.insert (std::make_pair (tmpCount, ((std::rand ()%100)/100.0 )));
 		}
@@ -172,6 +172,7 @@ QTable::SelectAction (QState currentQState)
 			}
 		}
 
+#if 1
 		//Need implement an Explore and Exploit part HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		//e-greedy E & E
 		double randomNo;
@@ -185,8 +186,17 @@ QTable::SelectAction (QState currentQState)
 			actionBias = minIt->first;
 		}
 
-		std::cout << Simulator::Now () << " IMSI : " <<  m_imsi <<  " minQVal : " << minQValue << "#### Action Bias : " << actionBias << std::endl;
+		//std::cout << Simulator::Now () << " IMSI : " <<  m_imsi <<  " minQVal : " << minQValue << "#### Action Bias : " << actionBias << std::endl;
 	}
+#else
+	
+		std::map<double, double>::iterator minIt = sameValue.begin ();
+		int ind = (std::rand () % sameValue.size ());
+		std::advance (minIt, ind);	// ramdomly select bias among the same min values
+		actionBias = minIt->first;
+	}
+
+#endif
 	m_lastAction = actionBias;
 }
 
