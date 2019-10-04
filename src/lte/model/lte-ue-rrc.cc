@@ -42,11 +42,11 @@ NS_LOG_COMPONENT_DEFINE ("LteUeRrc");
 
 QTable::QTable () 
 	:	m_lastAction (0),
-		alpha (0.5),
-		gamma (0.5),
-		m_eGreedyProb (0)
+		alpha (0.8),
+		gamma (0.8),
+		m_eGreedyProb (1.0)
 {
-	Simulator::Schedule ( MilliSeconds(60000), &QTable::ChangeEGreedyProbability, this);
+	//Simulator::Schedule ( MilliSeconds(60000), &QTable::ChangeEGreedyProbability, this);
 }
 
 QTable::~QTable () {
@@ -185,6 +185,7 @@ QTable::SelectAction (QState currentQState)
 			std::advance (minIt, ind);	// ramdomly select bias among the same min values
 			actionBias = minIt->first;
 		}
+		m_eGreedyProb = m_eGreedyProb * 0.99;
 
 		//std::cout << Simulator::Now () << " IMSI : " <<  m_imsi <<  " minQVal : " << minQValue << "#### Action Bias : " << actionBias << std::endl;
 	}
