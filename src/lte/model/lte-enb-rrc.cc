@@ -2393,7 +2393,7 @@ LteEnbRrc::DoTriggerHandover (uint16_t rnti, uint16_t targetCellId)
 	//now set 1 sec
 #if 1
 	std::cout << "Now : " << Simulator::Now () << " C-time : " << ueManager->GetConnectedTime () << " Diff : " << Simulator::Now() - ueManager->GetConnectedTime () << std::endl;
-	if ( (Simulator::Now () - ueManager->GetConnectedTime ()) < NanoSeconds (100000000))
+	if ( (Simulator::Now () - ueManager->GetConnectedTime ()) < NanoSeconds (2000000000))
 		{
 			isHandoverAllowed = false;
 		}
@@ -2701,6 +2701,12 @@ LteEnbRrc::SendSystemInformation ()
   Simulator::Schedule (m_systemInformationPeriodicity, &LteEnbRrc::SendSystemInformation, this);
 }
 
+std::map <uint16_t, Ptr<UeManager> > &
+LteEnbRrc::GetUeMap ()
+{
+	std::map <uint16_t, Ptr<UeManager> > &ref = m_ueMap;
+	return ref;
+}    
 
 } // namespace ns3
 

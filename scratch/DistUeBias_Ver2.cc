@@ -228,7 +228,7 @@ Vector CalcInitPicoPosition ( int n, double d, Vector center )
 	//std::cout << degree << std::endl;
 	v.x = floor (d * cos (DegreeToRadian (degree))) + center.x;
 	v.y = floor (d * sin (DegreeToRadian (degree))) + center.y;
-	v.z = 0;
+	v.z = 5.0;
 	return v;
 }
 
@@ -245,6 +245,7 @@ void SetUniformPicoPosition ( NodeContainer &c, Vector center, Vector initPicoPo
 		degree = degree + 360.0/nPico;
 		pos.x = floor (distPico * cos (DegreeToRadian (degree))) + center.x;
 		pos.y = floor (distPico * sin (DegreeToRadian (degree))) + center.y;
+		pos.z = 5.0;
 	}
 	MobilityHelper mobilityEnb;
 	mobilityEnb.SetPositionAllocator (positionEnb);
@@ -559,6 +560,29 @@ void PlotHO( double data_array1[], int num, uint16_t absInterval, double simTime
 */
 
 #endif
+void PrintAccess (NodeContainer enbNodes) {
+	for (uint8_t enbIt = 0; enbIt < enbNodes.GetN (); enbIt++)
+	{
+		Ptr <LteEnbRrc> enbRrc = enbNodes.Get(enbIt)->GetDevice (0)->GetObject <LteEnbNetDevice> ()->GetRrc ();
+		uint16_t cellId = enbNodes.Get(enbIt)->GetDevice (0)->GetObject <LteEnbNetDevice> ()->GetCellId ();
+
+		std::map <uint16_t, Ptr<UeManager> > ueMap = enbRrc->GetUeMap ();
+		std::cout << Simulator::Now () << " CELL#"<< cellId << " Num UEs:" << ueMap.size () << std::endl;
+		std::cout << "(";
+		for (std::map <uint16_t, Ptr<UeManager> >::iterator ueIt=ueMap.begin (); ueIt != ueMap.end (); ++ueIt) {
+			/*
+			std::stringstream ssImsi;
+			ssImsi << ueIt->second->GetImsi ();
+			std::stringstream ssRnti;
+			ssRnti << ueIt->second->GetRnti();
+			std::cout << " (" << ssImsi.str () << "," << ueIt->second->GetRnti () << ") |"
+			*/
+			std::cout << ueIt->second->GetImsi () << ",";
+		}
+	std::cout <<")" << std::endl;
+	}
+}
+
 
 NS_LOG_COMPONENT_DEFINE ("Simple");
 
@@ -579,12 +603,12 @@ int main (int argc, char *argv[])
 	Vector cellCenter = Vector( 512.0, 512.0, 0.0 );
 	double cellRadius = 512.0;
 #else
-	Vector cellCenter = Vector( 256.0, 256.0, 0.0 );
+	Vector cellCenter = Vector( 256.0, 256.0, 15.0 );
 	double cellRadius = 256.0;
 #endif
 	//double distancePico = cellRadius*3/4;
 	double distancePico = 170;
-	uint32_t nPicoEnb = 15;	//one of value 3, 6, 9, 12
+	uint32_t nPicoEnb = 9;	//one of value 3, 6, 9, 12
 	double picoTx = 30;
 	double picoVariance = 2.0;
 	//double picoRadius = cellRadius*1/4;
@@ -655,7 +679,7 @@ int main (int argc, char *argv[])
 	double simulationEnd = applicationEnd + 1.0;
 #if 1
 	double applicationDuration = applicationEnd - applicationStart;
-	double capacity = 168 * 1000 * 4 * nRB; //Mbps; 168 symbols/1ms * 4 bits(16QAM) * # of RBs
+	double capacity = 168 * 1000 * 6 * nRB; //Mbps; 168 symbols/1ms * 4 bits(16QAM) * # of RBs
 
 	//std::cout << "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA :: " << nUes << std::endl;
 #endif
@@ -887,13 +911,15 @@ int main (int argc, char *argv[])
 			Ptr<Node> pico =	enbNodes.Get (i+1);	//enbNodes(0) = macro eNB
 			Vector center = pico->GetObject <MobilityModel> ()->GetPosition ();
 			
-			char stringX[8],stringY[8],bounds[256];
+			char stringX[8],stringY[8],stringZ[8],bounds[256];
 			sprintf (stringX, "%f", center.x); 
 			sprintf (stringY, "%f", center.y); 
+			sprintf (stringZ, "%f", 1.5); 
 			sprintf (bounds, "ns3::UniformRandomVariable[Min=10|Max=%f]", picoRadius); 
 			mobilityUe.SetPositionAllocator ("ns3::RandomDiscPositionAllocator",
 																			"X", StringValue (stringX),
 																			"Y", StringValue (stringY),
+																			"Z", StringValue (stringZ),
 																			"Rho", StringValue (bounds));
 		#if 0
 			mobilityUe.SetMobilityModel ("ns3::ConstantPositionMobilityModel");
@@ -901,7 +927,7 @@ int main (int argc, char *argv[])
 
 			sprintf (bounds, "0|%f|0|%f", (center.x+picoRadius), (center.y+picoRadius));
 			mobilityUe.SetMobilityModel ("ns3::RandomWalk2dMobilityModel",
-																	"Mode", StringValue ("Time"),
+																	//"Mode", StringValue ("Time"),
 																	//"Time", StringValue ("0.01s"),
 																	"Bounds", StringValue (bounds));
 		#endif	
@@ -915,13 +941,15 @@ int main (int argc, char *argv[])
 		}
 
 		// 1/3 ues are uniformly distributed over the cell
-		char stringX[8],stringY[8],bounds[256];
+		char stringX[8],stringY[8],stringZ[8],bounds[256];
 		sprintf (stringX, "%f", cellCenter.x); 
 		sprintf (stringY, "%f", cellCenter.y); 
-		sprintf (bounds, "ns3::UniformRandomVariable[Min=35|Max=%f]", (distancePico-picoRadius+10)); 
+		sprintf (stringZ, "%f", 1.5); 
+		sprintf (bounds, "ns3::UniformRandomVariable[Min=35|Max=%f]", (distancePico-picoRadius)); 
 		mobilityUe.SetPositionAllocator ("ns3::RandomDiscPositionAllocator",
 																		"X", StringValue (stringX),
 																		"Y", StringValue (stringY),
+																		"Z", StringValue (stringZ),
 																		"Rho", StringValue (bounds));
 		#if 0
 			mobilityUe.SetMobilityModel ("ns3::ConstantPositionMobilityModel");
@@ -929,7 +957,7 @@ int main (int argc, char *argv[])
 
 		sprintf (bounds, "0|%f|0|%f", (cellCenter.x+cellRadius), (cellCenter.y+cellRadius));
 		mobilityUe.SetMobilityModel ("ns3::RandomWalk2dMobilityModel",
-																"Mode", StringValue ("Time"),
+																//"Mode", StringValue ("Time"),
 																//"Time", StringValue ("0.01s"),
 																"Bounds", StringValue (bounds));
 		#endif
@@ -985,8 +1013,15 @@ int main (int argc, char *argv[])
 	std::cout << "eNB " <<  " @ " << "( " <<pos.x << ", " << pos.y << ", " << pos.z << " )" << std::endl;
 #endif
 
-
+#if 1
 	lteHelper->SetAttribute ("PathlossModel", StringValue ("ns3::LogDistancePropagationLossModel"));
+	//lteHelper->SetPathlossModelAttribute("Exponent",DoubleValue(3.67));
+	//lteHelper->SetPathlossModelAttribute("ReferenceLoss",DoubleValue(39.6));
+#else	
+	lteHelper->SetAttribute ("PathlossModel", StringValue ("ns3::ItuR1411LosPropagationLossModel"));
+  lteHelper->SetPathlossModelAttribute("Frequency",DoubleValue(8.8e+8));
+#endif
+
 	lteHelper->SetSchedulerType ("ns3::RrFfMacScheduler");
 	lteHelper->SetEnbDeviceAttribute ("DlBandwidth", UintegerValue (nRB));
 	
@@ -1008,9 +1043,16 @@ int main (int argc, char *argv[])
 	//lteHelper->AddX2Interface (enbNodes);	
 
 #if 0
-	for (uint16_t i = 1; i < enbNodes.GetN (); i++ )
+	uint16_t maxNumEnb = enbNodes.GetN ();
+	for (uint16_t i = 1; i < maxNumEnb; i++ )
 	{
 		lteHelper->AddX2Interface (enbNodes.Get (0), enbNodes.Get (i));		//X2interface between a macro and pico enbs
+		if ( i == maxNumEnb-1 ) {
+			lteHelper->AddX2Interface (enbNodes.Get (i), enbNodes.Get (1));   //X2interface between a macro and pico enbs
+		}
+		else {
+			lteHelper->AddX2Interface (enbNodes.Get (i), enbNodes.Get (i+1));   //X2interface between a macro and pico enbs
+		}
 	}
 #else
 	for (uint16_t i = 0; i < enbNodes.GetN (); i++ )
@@ -1241,6 +1283,8 @@ int main (int argc, char *argv[])
 	//NetAnim
 	AnimationInterface anim(animFile);
 #endif
+	Simulator::Schedule (MilliSeconds(5000), &PrintAccess, enbNodes);
+	Simulator::Schedule (MilliSeconds(simTime*1000), &PrintAccess, enbNodes);
 
 	Simulator::Run ();
 

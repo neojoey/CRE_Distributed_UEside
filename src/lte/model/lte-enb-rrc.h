@@ -1020,6 +1020,8 @@ public:
 	uint32_t DoGetGlobalOutageCount ();
 #endif
 
+	std::map <uint16_t, Ptr<UeManager> > & GetUeMap ();
+
 private:
 
   /** 

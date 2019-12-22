@@ -1,11 +1,19 @@
 #!/bin/bash
-./run_r256_pico15_ue150_l05_abs2_RND.sh 3 1
-./run_r256_pico15_ue150_l05_abs2_RND.sh 3 2
-./run_r256_pico15_ue150_l05_abs2_RND.sh 3 3
-./run_r256_pico15_ue150_l05_abs2_RND.sh 3 4
-./run_r256_pico15_ue150_l05_abs2_RND.sh 3 5
-./run_r256_pico15_ue150_l05_abs2_RND.sh 3 6
-./run_r256_pico15_ue150_l05_abs2_RND.sh 3 7
-./run_r256_pico15_ue150_l05_abs2_RND.sh 3 8
-./run_r256_pico15_ue150_l05_abs2_RND.sh 3 9
-./run_r256_pico15_ue150_l05_abs2_RND.sh 3 10
+./run_r512_pico4_ue200_l05_abs2_poisson.sh 3 1 300
+./run_r512_pico4_ue200_l05_abs2_poisson.sh 3 2 300
+./run_r512_pico4_ue200_l05_abs2_poisson.sh 3 3 300
+./run_r512_pico4_ue200_l05_abs2_poisson.sh 3 4 300
+./run_r512_pico4_ue200_l05_abs2_poisson.sh 3 5 300
+./run_r512_pico4_ue200_l05_abs2_poisson.sh 3 6 300
+./run_r512_pico4_ue200_l05_abs2_poisson.sh 3 7 300
+./run_r512_pico4_ue200_l05_abs2_poisson.sh 3 8 300
+./run_r512_pico4_ue200_l05_abs2_poisson.sh 3 9 300
+./run_r512_pico4_ue200_l05_abs2_poisson.sh 4 1 300
+./run_r512_pico4_ue200_l05_abs2_poisson.sh 4 2 300
+./run_r512_pico4_ue200_l05_abs2_poisson.sh 4 3 300
+./run_r512_pico4_ue200_l05_abs2_poisson.sh 4 4 300
+./run_r512_pico4_ue200_l05_abs2_poisson.sh 4 5 300
+./run_r512_pico4_ue200_l05_abs2_poisson.sh 4 6 300
+./run_r512_pico4_ue200_l05_abs2_poisson.sh 4 7 300
+./run_r512_pico4_ue200_l05_abs2_poisson.sh 4 8 300
+./run_r512_pico4_ue200_l05_abs2_poisson.sh 4 9 300
